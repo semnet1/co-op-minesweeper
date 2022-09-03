@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+        <title>Co-op Minesweeper</title>
+        <link rel="icon" type="image/png" href="img/favicon.png" />
+
+        <style>
+            *{
+                user-select: none;
+            }
+            body{
+                background-image: url('img/background.jpeg'); 
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position: center;
+                background-attachment: fixed;
+            }
+            #loadingScreen{
+                position:fixed;
+                width:100%;
+                height:100%;
+                top: 0px;
+                left: 100%;
+                background-color: black;
+
+                opacity: 0;
+                transition: opacity 1s;
+            }
+            .show{
+                left: 0px !important;
+            }
+            .fade{
+                opacity: 1 !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="menu" class="w3-content" style="max-width: 1100px;">
+            <div class="w3-center w3-content">
+                <h1 style="font-size: 60px; text-shadow: -2px 0 white, 0 2px white, 2px 0 white, 0 -2px white;">Co-op Minesweeper</h1>
+            </div>
+
+            <div class="w3-half w3-container">
+                <br>
+                <div class="w3-card-4">
+                    <div class="w3-gray w3-container w3-center">
+                        <h2>Create Room</h2>
+                    </div>
+                    <div class="w3-container w3-white">
+                        <p>
+                            <label class="w3-text-grey">Name</label>
+                            <input id="name" type="text" class="w3-input w3-border" style="outline: none;" required>
+                        </p>
+                        <p>
+                            <label class="w3-text-grey">Password (optional)</label>
+                            <input id="password" type="text" class="w3-input w3-border" style="outline: none;">
+                        </p>
+
+                        <div onclick="toggleAccordion('difficultyRow')" class="w3-light-gray w3-center w3-hover-gray">
+                            <h4>Difficulty</h4>
+                        </div>
+                        <div id="difficultyRow" class="w3-row w3-hide">
+                            <div class="w3-half">
+                                <input class="w3-radio" type="radio" name="difficulty" value="beginner">
+                                <label>Beginner</label>
+                                <br>
+
+                                <input class="w3-radio" type="radio" name="difficulty" checked="checked" value="intermediate">
+                                <label>Intermediate</label>
+                                <br>
+
+                                <input class="w3-radio" type="radio" name="difficulty" value="expert">
+                                <label>Expert</label>
+                            </div>
+                            <div class="w3-half">
+                                <input id="custom" class="w3-radio" type="radio" name="difficulty" value="custom">
+                                <label>Custom:</label>
+                                <br> <br>
+
+                                <div class="w3-light-gray w3-padding w3-border">
+                                    <label id="bombPercentage">Bomb Percentage: 15%</label>
+                                    <br>
+
+                                    <input id="bombSlider" oninput="rename('bombPercentage', 'Bomb Percentage: '+this.value+'%')" type="range" min="10" max="50" value="15" step="0.5" style="width: 100%;" disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div onclick="toggleAccordion('boardSizeRow')" class="w3-light-gray w3-center w3-hover-gray">
+                            <h4>Board Size</h4>
+                        </div>
+                        <div id="boardSizeRow" class="w3-row w3-hide">
+                            <div class="w3-half">
+                                <input class="w3-radio" type="radio" name="size" value="small">
+                                <label>Small</label>
+                                <br>
+
+                                <input class="w3-radio" type="radio" name="size" value="medium" checked="checked">
+                                <label>Medium</label>
+                                <br>
+                                
+                                <input class="w3-radio" type="radio" name="size" value="large">
+                                <label>Large</label>
+                            </div>
+                            <div class="w3-half">
+                                <input class="w3-radio" type="radio" name="size" value="extraLarge">
+                                <label>Extra Large</label>
+                                <br>
+
+                                <input class="w3-radio" type="radio" name="size" value="infinite">
+                                <label>Infinite</label>
+                            </div>
+                        </div>
+
+                        <div onclick="toggleAccordion('othersRow')" class="w3-light-gray w3-center w3-hover-gray">
+                            <h4>Others</h4>
+                        </div>
+                        <div id="othersRow" class="w3-row w3-hide">
+                            <div class="w3-half">
+                                <input id="autoFlag" type="checkbox" class="w3-check" checked="checked">
+                                <label>Auto-place Flags</label>
+                                <br>
+
+                                <input id="autoReveal" type="checkbox" class="w3-check" checked="checked">
+                                <label>Auto-reveal Tiles</label>
+                                <br>
+
+                                <input id="noDeath" type="checkbox" class="w3-check">
+                                <label>No Death</label>
+                                <br>
+                            </div>
+                            <div class="w3-half">
+                                <input id="limitPlayers" oninput="toggleDisabled(this.checked, 'playersSlider')" type="checkbox" class="w3-check" checked="checked">
+                                <label>Limit Players</label>
+                                <br> <br>
+                                
+                                <div class="w3-light-gray w3-padding w3-border">
+                                    <label id="maxPlayers">Max Players: 2</label>
+                                    <br>
+
+                                    <input id="playersSlider" oninput="rename('maxPlayers', 'Max Players: '+this.value)" type="range" min="1" max="10" value="2" class="" style="width: 100%;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <p>
+                            <button onclick="createRoom()" class="w3-btn w3-padding w3-green" style="width: 100%;">Create</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="w3-half w3-container">
+                <br>
+                <div class="w3-card-4">
+                    <div class="w3-gray w3-container w3-center">
+                        <h2>Rooms</h2>
+                    </div>
+
+                    <table id="serverList" class="w3-table w3-striped w3-white">
+                        <tr>
+                            <th>Room Name</th>
+                            <th>Players</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <canvas id="canvas" class="w3-hide" style="image-rendering: pixelated; position:absolute;"></canvas>
+
+        <div id="loadingScreen">
+            <h1 style="color: white; font-size: 100px;" class="w3-display-middle">Loading...</h1>
+        </div>
+
+        <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+        <script src="script.js"></script>
+        <script src="connection.js"></script>
+        <script src="game.js"></script>
+    </body>
+</html>
