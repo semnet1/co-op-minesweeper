@@ -1,0 +1,32 @@
+*{
+    user-select: none;
+    font-weight: bold !important;
+}
+
+body{
+    background-image: url('img/background.jpeg'); 
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+#loadingScreen{
+    position:fixed;
+    width:100%;
+    height:100%;
+    top: 0px;
+    left: 100%;
+    background-color: black;
+
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.show{
+    left: 0px !important;
+}
+
+.fade{
+    opacity: 1 !important;
+}
