@@ -14,6 +14,12 @@ function getTilesAround(tile){
 
 function revealTile(tile){
     let around = getTilesAround(tile);
+    if(around.length < 8 && properties.size == "infinite"){
+        tile.revealed = true;
+        tile.sprite = "load";
+        return;
+    }
+
     let count = 0;
     for(let tile of around){
         if(tile.bomb) count++

@@ -32,7 +32,7 @@ window.addEventListener('wheel', e => {
     let oldZoom = zoom;
     zoom = zoom * (1 + e.deltaY/(-1000));
 
-    if(zoom < 2){zoom = 2};
+    if(zoom < 1){zoom = 1};
     if(zoom > 100){zoom = 100};
 
     pos.x += mouse.x/oldZoom - mouse.x/zoom;
@@ -63,14 +63,14 @@ window.onmouseup = e => {
 
             let x = Math.floor((pos.x+mouse.x/zoom)/16);
             let y = Math.floor((pos.y+mouse.y/zoom)/16);
-            socket.emit("updateboard", "leftClick", x, y);
+            socket.emit("mouseclick", "leftClick", x, y);
 
         } else if(e.which == 3){ // botão direito
             rightClick();
 
             let x = Math.floor((pos.x+mouse.x/zoom)/16);
             let y = Math.floor((pos.y+mouse.y/zoom)/16);
-            socket.emit("updateboard", "rightClick", x, y);
+            socket.emit("mouseclick", "rightClick", x, y);
         }
     }
 
@@ -122,6 +122,11 @@ socket.on("getboard", board => {
     this.board = board;
 });
 
+socket.on("getprops", props => {
+    console.log("properties", props);
+    properties = props;
+});
+
 function mergeDeep(target, source) {
     for (let key in source) {
         if (typeof source[key] == "object") {
@@ -136,5 +141,26 @@ function mergeDeep(target, source) {
 // recebe informações novas do campo e atualiza ele
 socket.on("boardinfo", changes => {
     mergeDeep(board, changes);
+
+    render();
+});
+
+// recebe informações novas do campo e atualiza ele
+socket.on("newtilesinfo", changes => {
+    mergeDeep(board, changes);
+
+    for(let x in changes){
+        let column = changes[x];
+        for(let y in column){
+            let tile = board[x][y];
+            let around = getTilesAround(tile);
+            for(let tile of around){
+                if(tile.sprite == "load"){
+                    revealTile(tile);
+                }
+            }
+        }
+    }
+
     render();
 });

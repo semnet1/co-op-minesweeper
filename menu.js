@@ -1,3 +1,6 @@
+// variáveis
+let properties = {};
+
 // elementos
 var radios = document.getElementsByName('difficulty');
 for (var i = 0, length = radios.length; i < length; i++){
@@ -54,7 +57,6 @@ function createRoom(){
     console.log("Creating Server...");
 
     let name = document.getElementById("name").value;
-    let properties = {};
 
     for(let room in rooms){
         if(room == name){
@@ -109,6 +111,10 @@ function createRoom(){
             properties.width = 60;
             properties.height = 32;
             break;
+        case "infinite":
+            properties.width = 1;
+            properties.height = 1;
+            break;
     }
     properties.autoFlag = document.getElementById("autoFlag").checked;
     properties.autoReveal = document.getElementById("autoReveal").checked;
@@ -132,15 +138,24 @@ function createRoom(){
 var gameStarted = false;
 document.getElementById("loadingScreen").addEventListener("transitionend", () => {
     if(!gameStarted){
+        // tela de carregamento
         document.getElementById("menu").classList.add("w3-hide");
         document.getElementById("canvas").classList.add("w3-show");
         document.getElementById("loadingScreen").classList.remove("fade");
         document.getElementById("body").style.backgroundImage = "url('')";
         document.addEventListener('contextmenu', event => event.preventDefault());
 
+        if(properties){
+            // centraliza o campo na tela
+            pos.x = ((window.innerWidth/zoom)/2 - (properties.width*16)/2)*(-1);
+            pos.y = ((window.innerHeight/zoom)/2 - (properties.height*16)/2)*(-1);
+        }
+        
+        // carrega o primeiro frame
         gameStarted = true;
         render();
     } else{
+        // tira a tela de carregamento
         document.getElementById("loadingScreen").classList.remove("show");
     }
 });
