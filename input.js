@@ -59,17 +59,19 @@ window.onmouseup = e => {
     
     if(!mouse.moving){
         if(e.which == 1){ // botão esquerdo
-            leftClick();
-
             let x = Math.floor((pos.x+mouse.x/zoom)/16);
             let y = Math.floor((pos.y+mouse.y/zoom)/16);
+            if(!board[x] || !board[x][y]) return;
+
+            leftClick();
             socket.emit("mouseclick", "leftClick", x, y);
 
         } else if(e.which == 3){ // botão direito
-            rightClick();
-
             let x = Math.floor((pos.x+mouse.x/zoom)/16);
             let y = Math.floor((pos.y+mouse.y/zoom)/16);
+            if(!board[x] || !board[x][y]) return;
+
+            rightClick();
             socket.emit("mouseclick", "rightClick", x, y);
         }
     }
