@@ -44,7 +44,7 @@ function leftClick(){
         let tiles = getTilesAround(tile);
         let count = 0;
         for(let tile of tiles){
-            if(tile.flagged) count++;
+            if(tile.flagged || tile.bomb && tile.revealed) count++;
         }
 
         if(tile.sprite == count.toString()){
@@ -75,7 +75,7 @@ function rightClick(){
         let tiles = getTilesAround(tile);
         let count = 0;
         for(let tile of tiles){
-            if(!tile.revealed) count++;
+            if(!tile.revealed || tile.bomb && tile.revealed) count++;
         }
 
         if(tile.sprite == count.toString()){

@@ -22,6 +22,11 @@ body{
 #scrollableContent{
     height: 100%;
     overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+#scrollableContent::-webkit-scrollbar {
+  display: none;
 }
 
 #loadingScreen{
