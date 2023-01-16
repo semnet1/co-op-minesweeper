@@ -3,13 +3,25 @@
     font-weight: bold !important;
 }
 
+html{
+    overscroll-behavior: contain;
+    overflow: hidden;
+    height: 100%;
+}
+
 body{
     background-image: url('img/background.jpeg'); 
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    overscroll-behavior: contain;
+    height: 100%;
+    overflow: hidden;
+}
+
+#scrollableContent{
+    height: 100%;
+    overflow-y: scroll;
 }
 
 #loadingScreen{
@@ -30,4 +42,11 @@ body{
 
 .fade{
     opacity: 1 !important;
+}
+
+form#searchform{
+    display: none;
+}
+form#searchform2{
+    display: none;
 }

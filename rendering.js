@@ -78,9 +78,8 @@ setInterval(() => {
     if(!gameStarted) return;
     render();
 
-    if(mobile && mouse.down && Date.now() > mouse.when+200 && !pressed && !zooming){
+    if(mobile && mouse.down && Date.now() > mouse.when+250 && !pressed && !zooming && !mouse.moving){
         pressed = true;
-        console.log("wtf");
         // botão direito
         let x = Math.floor((pos.x+mouse.x/zoom)/16);
         let y = Math.floor((pos.y+mouse.y/zoom)/16);
@@ -93,7 +92,7 @@ setInterval(() => {
     if(zooming){
         let dist1 = Math.sqrt(Math.abs(zoomtouch.x1 - zoomtouch.x2) + Math.abs(zoomtouch.y1 - zoomtouch.y2));
         let dist2 = Math.sqrt(Math.abs(mouse.x - mouse.x2) + Math.abs(mouse.y - mouse.y2));
-        zoom = zoom * dist1/dist2;
+        zoom = zoom * (dist2/dist1);
     
         if(zoom < 1){zoom = 1};
         if(zoom > 100){zoom = 100};
@@ -109,6 +108,7 @@ setInterval(() => {
 
 // renderiza o jogo
 function render(){
+    if(!gameStarted) return;
     // apaga o canvas
     ctx.fillStyle = "#36393f";
     ctx.fillRect(0, 0, canvas.width, canvas.height);

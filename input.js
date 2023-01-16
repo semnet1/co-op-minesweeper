@@ -89,6 +89,10 @@ window.ontouchstart = e => {
 
     mouse.x = e.touches[0].clientX;
     mouse.y = e.touches[0].clientY;
+    if(e.touches[1]){
+        mouse.x2 = e.touches[1].clientX;
+        mouse.y2 = e.touches[1].clientY;
+    }
 
     mouse.down = true;
     mouse.when = Date.now();
@@ -103,8 +107,13 @@ window.ontouchstart = e => {
         zoomtouch.x2 = e.touches[1].clientX;
         zoomtouch.y2 = e.touches[1].clientY;
     }
+    
+    socket.emit("updatepos", {
+        x: pos.x+mouse.x/zoom,
+        y: pos.y+mouse.y/zoom
+    });
 }
-window.ontouchend = () => {
+window.ontouchend = e => {
     if(!gameStarted) return;
     pressed = false;
 
@@ -167,8 +176,10 @@ window.ontouchmove = e => {
 
     mouse.x = e.touches[0].clientX;
     mouse.y = e.touches[0].clientY;
-    mouse.x2 = e.touches[1].clientX;
-    mouse.y2 = e.touches[1].clientY;
+    if(e.touches[1]){
+        mouse.x2 = e.touches[1].clientX;
+        mouse.y2 = e.touches[1].clientY;
+    }
 
     let dist = Math.sqrt(Math.abs(pin.x - mouse.x) + Math.abs(pin.y - mouse.y));
     if(mouse.moving){
