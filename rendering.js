@@ -73,7 +73,39 @@ function drawTile(tile, x, y){
     ctx.drawImage(sprites, sprite.x, sprite.y, 16, 16, (x*16-pos.x)*zoom, (y*16-pos.y)*zoom, 16*zoom, 16*zoom);
 }
 
-setInterval(render, 50);
+let pressed = false;
+setInterval(() => {
+    if(!gameStarted) return;
+    render();
+
+    if(mobile && mouse.down && Date.now() > mouse.when+200 && !pressed && !zooming){
+        pressed = true;
+        console.log("wtf");
+        // botão direito
+        let x = Math.floor((pos.x+mouse.x/zoom)/16);
+        let y = Math.floor((pos.y+mouse.y/zoom)/16);
+        if(!board[x] || !board[x][y]) return;
+
+        rightClick();
+        socket.emit("mouseclick", "rightClick", x, y);
+    }
+
+    if(zooming){
+        let dist1 = Math.sqrt(Math.abs(zoomtouch.x1 - zoomtouch.x2) + Math.abs(zoomtouch.y1 - zoomtouch.y2));
+        let dist2 = Math.sqrt(Math.abs(mouse.x - mouse.x2) + Math.abs(mouse.y - mouse.y2));
+        zoom = zoom * dist1/dist2;
+    
+        if(zoom < 1){zoom = 1};
+        if(zoom > 100){zoom = 100};
+    
+        zoomtouch.x1 = mouse.x;
+        zoomtouch.x2 = mouse.x2;
+        zoomtouch.y1 = mouse.y;
+        zoomtouch.y2 = mouse.y2;
+    
+        render();
+    }
+}, 50);
 
 // renderiza o jogo
 function render(){

@@ -1,5 +1,5 @@
 // conexão com o server
-const socket = io("https://Minesweeper.semnet1.repl.co");
+const socket = io("http://localhost:3000");
 socket.on("connect", () => {
     console.log("You connected with id: " + socket.id);
 });

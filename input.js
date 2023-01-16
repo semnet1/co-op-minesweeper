@@ -42,7 +42,7 @@ window.addEventListener('wheel', e => {
 });
 
 // detecta o clique do mouse e ativa o pin
-window.onmousedown = e => {
+window.onmousedown = () => {
     if(!gameStarted) return;
 
     mouse.down = true;
@@ -79,8 +79,58 @@ window.onmouseup = e => {
     mouse.moving = false;
 };
 
+// detecta o toque na tela e ativa o pin
+let mobile = false;
+let zooming = false;
+let zoomtouch = {x1:null,y1:null,x2:null,y2:null};
+window.ontouchstart = e => {
+    mobile = true;
+    if(!gameStarted) return;
+
+    mouse.x = e.touches[0].clientX;
+    mouse.y = e.touches[0].clientY;
+
+    mouse.down = true;
+    mouse.when = Date.now();
+    
+    pin.x = mouse.x;
+    pin.y = mouse.y;
+
+    if(e.touches.length > 1){
+        zooming = true;
+        zoomtouch.x1 = e.touches[0].clientX;
+        zoomtouch.y1 = e.touches[0].clientY;
+        zoomtouch.x2 = e.touches[1].clientX;
+        zoomtouch.y2 = e.touches[1].clientY;
+    }
+}
+window.ontouchend = () => {
+    if(!gameStarted) return;
+    pressed = false;
+
+    mouse.down = false;
+    canvas.style.cursor = null;
+    
+    if(!mouse.moving){
+        if(Date.now() < mouse.when+200){ // botão esquerdo
+            let x = Math.floor((pos.x+mouse.x/zoom)/16);
+            let y = Math.floor((pos.y+mouse.y/zoom)/16);
+            if(!board[x] || !board[x][y]) return;
+
+            leftClick();
+            socket.emit("mouseclick", "leftClick", x, y);
+        }
+    }
+
+    mouse.moving = false;
+    
+    if(e.touches.length < 2){
+        zooming = false;
+    }
+};
+
 // detecta movimento do mouse, seta suas coordenadas
-window.addEventListener("mousemove", function(e){
+window.onmousemove = e => {
     if(!gameStarted) return;
 
     mouse.x = e.clientX;
@@ -109,7 +159,38 @@ window.addEventListener("mousemove", function(e){
     });
 
     render();
-}, false);
+};
+
+// detecta movimento do toque, seta suas coordenadas
+window.ontouchmove = e => {
+    if(!gameStarted) return;
+
+    mouse.x = e.touches[0].clientX;
+    mouse.y = e.touches[0].clientY;
+    mouse.x2 = e.touches[1].clientX;
+    mouse.y2 = e.touches[1].clientY;
+
+    let dist = Math.sqrt(Math.abs(pin.x - mouse.x) + Math.abs(pin.y - mouse.y));
+    if(mouse.moving){
+        pos.x = pin.pos.x - ((pin.pos.x + mouse.x/zoom) - (pin.x/pin.zoom+pin.pos.x));
+        pos.y = pin.pos.y - ((pin.pos.y + mouse.y/zoom) - (pin.y/pin.zoom+pin.pos.y));
+    } else if(dist > 3){
+        pin.x = mouse.x;
+        pin.y = mouse.y;
+        pin.pos.x = pos.x;
+        pin.pos.y = pos.y;
+        pin.zoom = zoom;
+
+        mouse.moving = true;
+    }
+
+    socket.emit("updatepos", {
+        x: pos.x+mouse.x/zoom,
+        y: pos.y+mouse.y/zoom
+    });
+
+    render();
+};
 
 // detecta movimento de outro jogador, seta suas coordenadas
 socket.on("updatepos", (id, position) => {
